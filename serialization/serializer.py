@@ -1,10 +1,6 @@
 from pymongo import MongoClient
 
-# client = MongoClient("mongodb://localhost:27017/")
-# db = client["cryptodb"]
-# collection = db["currency"]
-
-def searializer(obj) -> dict:
+def serializer(obj) -> dict:
     response = {}
     for value in obj:
         if value == "_id":

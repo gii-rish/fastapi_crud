@@ -5,7 +5,7 @@ import pymongo
 
 from fastapi import FastAPI
 import uvicorn
-from serialization.database import searializer
+from serialization.serializer import serializer
 from models.models import CryptoCurrency
 from fastapi.exceptions import HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -27,7 +27,7 @@ async def get_currencies():
         currencies = currency_collection.find()
         
         for i in currencies:
-            currency_list.append(searializer(i))        
+            currency_list.append(serializer(i))        
     return JSONResponse(status_code=200, content=currency_list)
 
 
@@ -39,7 +39,7 @@ async def get_currency(id: str):
         currency_collection = client[db][collection]
         
         if (currency := currency_collection.find_one({"_id": ObjectId(id)})) is not None:            
-            return JSONResponse(status_code=200, content=searializer(currency))
+            return JSONResponse(status_code=200, content=serializer(currency))
 
     raise HTTPException(status_code=404, detail=f"Currency with id - {id} not found")
 
@@ -53,7 +53,7 @@ async def add_crypto(request: CryptoCurrency):
         currency_collection = client[db][collection]
         new_entry = currency_collection.insert_one(currency)
         created_currency = currency_collection.find_one({"_id": new_entry.inserted_id})
-        return JSONResponse(status_code=201, content=searializer(created_currency))
+        return JSONResponse(status_code=201, content=serializer(created_currency))
     
     raise HTTPException(status_code=500, detail="Internal server error")
 
@@ -70,7 +70,7 @@ async def update_currency(id: str, request: CryptoCurrency):
 
             if update_result:
                 if (updated_currency := currency_collection.find_one({"_id": ObjectId(id)})) is not None:
-                    return JSONResponse(status_code=201, content=searializer(updated_currency))
+                    return JSONResponse(status_code=201, content=serializer(updated_currency))
                 
             raise HTTPException(status_code=500, detail="Internal server error")
 
